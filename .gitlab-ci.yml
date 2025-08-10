@@ -12,14 +12,17 @@ pages:
   stage: deploy
   script:
     - cd my-weather-app
-    - npm ci || npm install        
-    - npm run build                
+    - echo "Node $(node -v), npm $(npm -v)"
+    - echo "---- vite.config.js ----"; sed -n '1,120p' vite.config.js
+    - npm ci || npm install
+    - npm run build -- --base=./       
     - cd ..
     - rm -rf public
     - mv my-weather-app/dist public
-    - cp public/index.html public/404.html  
+    - cp public/index.html public/404.html || true
+    - echo "---- built index.html (tail) ----"; tail -n 30 public/index.html
+    - echo "---- public tree ----"; ls -R public
   artifacts:
-    paths:
-      - public
+    paths: [public]
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
