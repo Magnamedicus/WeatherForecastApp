@@ -1,22 +1,25 @@
 
-image: node:20
 
+image: node:20
+stages: [deploy]
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - node_modules/
+    - my-weather-app/node_modules/
 
 pages:
   stage: deploy
   script:
-    - npm ci
-    - npm run build               
-    - rm -rf public               
-    - mv dist public              
+    - cd my-weather-app
+    - npm ci || npm install        
+    - npm run build                
+    - cd ..
+    - rm -rf public
+    - mv my-weather-app/dist public
     - cp public/index.html public/404.html  
   artifacts:
     paths:
       - public
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'     
+    - if: '$CI_COMMIT_BRANCH == "main"'
